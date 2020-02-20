@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+	<title><ui:insert name="title">#{msg.addDestinations}</ui:insert>
+	</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="resources/basic.css" type="text/css" />
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+	<link rel="stylesheet"
+		href="https://www.w3schools.com/lib/w3-theme-black.css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<style>
+#gmap {
+	width: 100%;
+	height: 800px;
+}
+</style>
+</h:head>
+<h:body>
+	<f:event listener="#{loginHandler.checkLoggedIn}" type="preRenderView" />
+	<script type="text/javascript"
+		src="https://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript">
+		var currentMarker = null;
+
+		function handlePointClick(event) {
+			if (currentMarker === null) {
+				document.getElementById('lat').value = event.latLng.lat();
+				document.getElementById('lng').value = event.latLng.lng();
+
+				currentMarker = new google.maps.Marker({
+					position : new google.maps.LatLng(event.latLng.lat(),
+							event.latLng.lng())
+				});
+
+				PF('map').addOverlay(currentMarker);
+
+				PF('dlg').show();
+			}
+		}
+
+		function markerAddComplete() {
+			var title = document.getElementById('title');
+			currentMarker.setTitle(title.value);
+			title.value = "";
+
+			var textD = document.getElementById('textD');
+			currentMarker.setData(textD.value);
+			textD.value = "";
+
+			currentMarker = null;
+			PF('dlg').hide();
+		}
+
+		function cancel() {
+			PF('dlg').hide();
+			currentMarker.setMap(null);
+			currentMarker = null;
+
+			return false;
+		}
+	</script>
+
+
+	<p:growl id="messages" showDetail="true" />
+	<ui:include src="/headers_footers/headerLoggedIn.xhtml" />
+	<div class="w3-padding" id="content">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+			<div class="w3-container w3-padding-32">
+				<ui:insert name="content">
+					<h:form prependId="false">
+						<div class="w3-row-padding w3-margin-top">
+							<div class="w3-quarter w3-container">
+								<h:commandButton class="w3-button w3-theme w3-margin-bottom"
+									action="#{travelHandler.saveTravel()}"
+									value="#{msg.saveTravel}" style="width:100%;height:100%"
+									disabled="#{!travelHandler.profileRightUser.viewProfileRight.canEdit}" />
+								<div class="w3-responsive w3-card-4">
+									<h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">#{msg.addDestinations}</h3>
+									<h:panelGrid var="travel" value="#{travelHandler.tmpTravel}"
+										columns="2" headerClass="header" footerClass="footer">
+
+										<h:outputLabel value="#{msg.titel}:" for="titel" />
+										<br />
+										<h:panelGroup>
+											<h:outputText id="titel"
+												value="#{travelHandler.tmpTravel.title}" />
+										</h:panelGroup>
+										<br />
+										<h:outputLabel value="#{msg.description}:" for="textT" />
+										<br />
+										<h:panelGroup>
+											<h:outputText id="textT"
+												value="#{travelHandler.tmpTravel.text}" />
+										</h:panelGroup>
+
+									</h:panelGrid>
+								</div>
+								<h:commandButton class="w3-button w3-theme w3-margin-top"
+									action="#{travelHandler.editTravel()}"
+									value="#{msg.editTravel}" style="width:100%;height:100%"
+									disabled="#{!travelHandler.profileRightUser.viewProfileRight.canEdit}" />
+								<div class="w3-responsive w3-card-4  w3-margin-top">
+									<h3
+										class="w3-border-bottom w3-border-light-grey w3-padding-16 w3-center">#{msg.destinations}</h3>
+									<p:dataTable class="w3-table w3-striped" id="destinationTable"
+										var="destination" value="#{travelHandler.destinations}"
+										widgetVar="destinationTable" editable="true">
+
+										<p:column class="w3-white" headerText="#{msg.titel}"
+											sortBy="#{destination.title}" filterBy="#{destination.title}">
+											<h:outputText value="#{destination.title}" />
+										</p:column>
+
+										<p:column class="w3-white" width="30">
+											<p:commandLink action="#{travelHandler.centerOn()}"
+												update="@form">
+												<i class="fa fa-map-pin" />
+											</p:commandLink>
+										</p:column>
+										<p:column class="w3-white" width="30">
+											<p:commandLink
+												disabled="#{!travelHandler.profileRightUser.viewProfileRight.canEdit}"
+												action="#{travelHandler.deleteDestination(false)}"
+												update="@form destinationTable">
+												<i class="fa fa-trash" />
+											</p:commandLink>
+										</p:column>
+
+									</p:dataTable>
+								</div>
+							</div>
+							<div class="w3-threequarter w3-container">
+								<p:gmap id="gmap" center="#{travelHandler.center}" zoom="13"
+									type="HYBRID" model="#{travelHandler.advancedModel}"
+									onPointClick="handlePointClick(event);" widgetVar="map">
+
+									<p:ajax event="overlaySelect"
+										listener="#{travelHandler.onMarkerSelect}" />
+
+									<p:gmapInfoWindow id="infoWindow">
+										<p:outputPanel
+											style="text-align: center; display: block; margin: auto">
+											<h3
+												class="w3-border-bottom w3-border-light-grey w3-padding-16">#{msg.editDestination}</h3>
+
+											<h:panelGrid columns="2">
+												<h:outputLabel for="titlei" value="#{msg.titel}:" />
+												<p:inputText class="w3-input w3-section w3-border"
+													id="titleinfoWindow" value="#{travelHandler.marker.title}" />
+
+												<h:outputLabel for="textDi" value="#{msg.description}:" />
+												<p:inputText class="w3-input w3-section w3-border"
+													id="textDinfoWindow" value="#{travelHandler.marker.data}" />
+
+											</h:panelGrid>
+											<h:panelGrid var="travel" value="#{travelHandler.tmpTravel}"
+												columns="2" headerClass="header" footerClass="footer">
+												<h:panelGroup>
+													<h:commandButton class="w3-button w3-black w3-section"
+														value="#{msg.save}"
+														action="#{travelHandler.saveDestination()}"
+														update="@form"
+														disabled="#{!travelHandler.profileRightUser.viewProfileRight.canEdit}" />
+													<h:commandButton class="w3-button w3-black w3-section"
+														value="#{msg.delete}"
+														action="#{travelHandler.deleteDestination(true)}"
+														update="@form" />
+												</h:panelGroup>
+												<h:panelGroup>
+												<h:commandButton class="w3-button w3-black w3-section "
+													value="#{msg.cancel}" onclick="return cancel()" />
+											</h:panelGroup>
+											</h:panelGrid>
+										</p:outputPanel>
+									</p:gmapInfoWindow>
+								</p:gmap>
+
+								<p:dialog class="w3-container w3-card w3-white w3-margin-bottom"
+									widgetVar="dlg" showEffect="fade" style="text-align: center"
+									showHeader="false">
+									<h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">#{msg.addDestinations}</h3>
+									<h:panelGrid columns="2">
+										<h:outputLabel for="title" value="#{msg.titel}:" />
+										<p:inputText class="w3-input w3-section w3-border" id="title"
+											value="#{travelHandler.tmpDestination.title}" />
+
+										<h:outputLabel for="textD" value="#{msg.description}:" />
+										<p:inputText class="w3-input w3-section w3-border" id="textD"
+											value="#{travelHandler.tmpDestination.text}" />
+
+									</h:panelGrid>
+
+									<h:commandButton class="w3-button w3-black w3-section"
+										value="#{msg.create}"
+										action="#{travelHandler.addDestination()}" update="@form"
+										oncomplete="markerAddComplete()"
+										disabled="#{!travelHandler.profileRightUser.viewProfileRight.canEdit}" />
+									<h:commandButton class="w3-button w3-black w3-section"
+										value="#{msg.cancel}" onclick="return cancel()" />
+
+
+
+									<h:inputHidden id="lat"
+										value="#{travelHandler.tmpDestination.lat}" />
+									<h:inputHidden id="lng"
+										value="#{travelHandler.tmpDestination.lng}" />
+								</p:dialog>
+							</div>
+						</div>
+					</h:form>
+				</ui:insert>
+			</div>
+		</div>
+	</div>
+	<div class="w3-container w3-bottom w3-center w3-black w3-padding-16">
+		<ui:insert name="footer">
+			<i class="fa fa-copyright" />
+			<a href="/td/about.xhtml" title="#{msg.developers}" target="_blank"
+				class="w3-hover-text-green">Maximilian Werner, Philipp Köhnken
+				und Tobias Stelter</a>
+		</ui:insert>
+	</div>
+</h:body>
+</html>

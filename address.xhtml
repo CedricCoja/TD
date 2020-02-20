@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<link rel="stylesheet"
+		href="#{request.contextPath}/resources/basic.css" type="text/css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="#{request.contextPath}/resources/w3.css"
+		type="text/css" />
+	<title><ui:insert name="title">
+#{msg.address}
+</ui:insert></title>
+</h:head>
+<h:body>
+	<f:event listener="#{loginHandler.checkLoggedIn}" type="preRenderView" />
+	<!-- Header -->
+	<ui:include src="/headers_footers/headerLoggedInWithoutReturnHandler.xhtml" />
+	<!-- Content -->
+	<div class="w3-content w3-padding" id="content">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+			<div class="w3-container w3-padding-32">
+				<ui:insert name="content">
+					<h:form id="form">
+						<p:growl id="msgs" showDetail="true" />
+						<h:panelGrid var="address" value="#{addressHandler.address}"
+							columns="2" headerClass="header" footerClass="footer">
+							<h:outputLabel value="#{msg.user}" for="userT" />
+							<h:panelGroup>
+								<h:inputText id="userT" required="true" readonly="true"
+									class="w3-input w3-section w3-border"
+									value="#{addressHandler.profileRightUser.completeName}"
+									requireMessage="entry missing">
+									<f:converter converterId="trimConverter" />
+								</h:inputText>
+							</h:panelGroup>
+							<h:outputLabel value="Straße:" for="street" />
+							<h:panelGroup>
+								<h:inputText required="true" id="street"
+									value="#{addressHandler.address.street}"
+									requireMessage="Eingabe fehlt"
+									class="w3-input w3-section w3-border">
+									<f:converter converterId="trimConverter" />
+								</h:inputText>
+								<h:message for="street" styleClass="message" />
+							</h:panelGroup>
+							<h:outputLabel value="Postleitzahl:" for="plz" />
+							<h:panelGroup>
+								<h:inputText required="true" id="plz"
+									value="#{addressHandler.address.plz}"
+									requireMessage="Eingabe fehlt"
+									class="w3-input w3-section w3-border">
+									<f:converter converterId="trimConverter" />
+									<f:validator validatorId="addressValidator" />
+								</h:inputText>
+								<h:message for="plz" styleClass="message" />
+							</h:panelGroup>
+							<h:outputLabel value="Ort:" for="place" />
+							<h:panelGroup>
+								<h:inputText required="true" id="place"
+									value="#{addressHandler.address.place}"
+									requireMessage="Eingabe fehlt"
+									class="w3-input w3-section w3-border">
+									<f:converter converterId="trimConverter" />
+								</h:inputText>
+								<h:message for="place" styleClass="message" />
+							</h:panelGroup>
+						</h:panelGrid>
+						<h:commandButton action="#{addressHandler.add()}"
+							value="#{msg.save}" update="message_growl"
+							class="w3-button w3-black w3-section"
+							disabled="#{!addressHandler.profileRightUser.viewProfileRight.canEdit}" />
+						<h:commandButton immediate="true" action="#{returnHandler.lastPage()}"
+							value="#{msg.cancel}" class="w3-button w3-black w3-section" />
+					</h:form>
+				</ui:insert>
+			</div>
+		</div>
+	</div>
+	<!-- Footer -->
+	<ui:include src="/headers_footers/footer.xhtml" />
+</h:body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<link rel="stylesheet"
+		href="#{request.contextPath}/resources/basic.css" type="text/css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="#{request.contextPath}/resources/w3.css"
+		type="text/css" />
+	<title><ui:insert name="title">
+		#{msg.usermanagement}	
+	</ui:insert></title>
+</h:head>
+<h:body>
+	<f:event listener="#{loginHandler.checkLoggedIn}" type="preRenderView" />
+	<!-- Header -->
+	<ui:include src="/headers_footers/headerLoggedIn.xhtml" />
+	<!-- Content -->
+	<div class="w3-content w3-padding" id="content">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+			<div class="w3-container w3-padding-32">
+				<ui:insert name="content">
+					<h:form id="form">
+						<p:growl id="msgs" showDetail="true" />
+
+						<h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">#{msg.usermanagement}</h3>
+
+						<p:dataTable id="userTable" var="user"
+							value="#{userHandler.users}" widgetVar="userTable"
+							editable="true">
+
+							<p:ajax event="rowEdit" listener="#{userHandler.onRowEdit}"
+								update=":form:msgs" />
+
+							<p:column headerText="#{msg.role}" width="200"
+								rendered="#{userHandler.user.performIsWorkingByTravelDiary()}"
+								disabled="#{!profilHandler.profileRightUser.viewProfileRight.canChangeRole}">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{user.role.label}" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectOneMenu value="#{user.role}">
+											<f:selectItems value="#{userHandler.roles}" var="role"
+												itemLabel="#{role.label}" itemValue="#{role}" />
+										</h:selectOneMenu>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{msg.username}" sortBy="#{user.username}"
+								width="200" filterBy="#{user.username}">
+								<h:outputText value="#{user.username}" />
+							</p:column>
+
+							<p:column headerText="#{msg.email}" width="200"
+								sortBy="#{user.email}" filterBy="#{user.email}">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{user.email}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{user.email}" style="width:100%"
+											label="email" requireMessage="entry missing">
+											<f:converter converterId="trimConverter" />
+											<f:validator validatorId="emailValidator" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+
+							<p:column headerText="#{msg.form}" sortBy="#{user.gender.label}"
+								filterBy="#{user.gender.label}"
+								rendered="#{userHandler.user.performIsWorkingByTravelDiary()}">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{user.gender}" />
+									</f:facet>
+									<f:facet name="input">
+										<h:selectOneMenu value="#{user.gender}">
+											<f:selectItems value="#{userHandler.genders}" var="gender"
+												itemLabel="#{gender}" itemValue="#{gender}" />
+										</h:selectOneMenu>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="#{msg.firstName}" width="200"
+								sortBy="#{user.firstName}" filterBy="#{user.firstName}"
+								rendered="#{userHandler.user.performIsWorkingByTravelDiary()}">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{user.firstName}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{user.firstName}" style="width:100%"
+											label="firstName" requireMessage="entry missing">
+											<f:converter converterId="trimConverter" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{msg.lastName}" sortBy="#{user.lastName}"
+								width="200" filterBy="#{user.lastName}"
+								rendered="#{userHandler.user.performIsWorkingByTravelDiary()}">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{user.lastName}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{user.lastName}" style="width:100%"
+											label="lastName" requireMessage="entry missing">
+											<f:converter converterId="trimConverter" />
+										</p:inputText>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="#{msg.birthDate}" sortBy="#{user.birthday}"
+								width="200" filterBy="#{user.birthday}"
+								rendered="#{userHandler.user.performIsWorkingByTravelDiary()}">
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{user.birthday}">
+											<f:convertDateTime pattern="dd.mm.yyyy" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:calendar id="popup" requireMessage="entry missing"
+											pattern="dd.mm.yyyy" timeZone="GMT" value="#{user.birthday}">
+										</p:calendar>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column width="200">
+								<f:facet name="header">#{msg.profil}</f:facet>
+								<h:commandButton
+									action="#{userHandler.showProfil(profilHandler)}"
+									value="#{msg.profil}" class="w3-button w3-light-grey w3-block" />
+							</p:column>
+							<p:column width="200"
+								rendered="#{userHandler.user.performIsWorkingByTravelDiary()}">
+								<f:facet name="header">#{msg.address}</f:facet>
+								<h:commandButton
+									action="#{userHandler.showAddresses(profilHandler, addressHandler)}"
+									value="#{msg.address}" class="w3-button w3-light-grey w3-block" />
+							</p:column>
+							<p:column width="200"
+								rendered="#{userHandler.user.performIsWorkingByTravelDiary()}">
+								<f:facet name="header">#{msg.creditCard}</f:facet>
+								<h:commandButton
+									action="#{userHandler.editCreditCard(profilHandler)}"
+									value="#{msg.creditCard}"
+									class="w3-button w3-light-grey w3-block" />
+							</p:column>
+							<p:column width="200">
+								<f:facet name="header">#{msg.friend}</f:facet>
+								<h:commandButton
+									disabled="#{!user.viewProfileRight.canSendFriendsMessages}"
+									rendered="#{user.viewProfileRight.canSendFriendsMessages}"
+									action="#{friendHandler.sendFriendRequest(user)}"
+									value="#{msg.add}" class="w3-button w3-light-grey w3-block"
+									id="sendFriendRequest" />
+								<p:message for="sendFriendRequest" styleClass="message" />
+								<h:commandButton id="removeFriend"
+									disabled="#{user.viewProfileRight.canBeFriend}"
+									rendered="#{!user.viewProfileRight.canBeFriend}"
+									action="#{userHandler.removeFriend(friendHandler, user)}"
+									value="#{msg.remove}" class="w3-button w3-light-grey w3-block"
+									update="removeFriend" />
+								<p:message for="removeFriend" styleClass="message" />
+							</p:column>
+							<p:column width="30"
+								rendered="#{userHandler.user.performIsAdmin()}">
+								<f:facet name="header"></f:facet>
+								<p:rowEditor />
+							</p:column>
+							<p:column rendered="#{userHandler.user.performIsAdmin()}"
+								width="30">
+								<f:facet name="header">
+								</f:facet>
+								<p:commandLink
+									action="#{userHandler.deleteUser(profilHandler,loginHandler)}"
+									update="@form">
+									<i class="fa fa-trash" />
+								</p:commandLink>
+							</p:column>
+						</p:dataTable>
+						<h:commandButton action="#{returnHandler.back()}"
+							value="#{msg.back}" class="w3-button w3-black w3-section" />
+					</h:form>
+				</ui:insert>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<ui:include src="/headers_footers/footer.xhtml" />
+
+</h:body>
+</html>

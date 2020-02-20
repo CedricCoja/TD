@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<link rel="stylesheet"
+		href="#{request.contextPath}/resources/basic.css" type="text/css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="#{request.contextPath}/resources/w3.css"
+		type="text/css" />
+	<title><ui:insert name="title">
+		#{msg.profil}	
+	</ui:insert></title>
+</h:head>
+<h:body>
+	<f:event listener="#{loginHandler.checkLoggedIn}" type="preRenderView" />
+	<!-- Header -->
+	<ui:include src="/headers_footers/headerLoggedIn.xhtml" />
+	<!-- Content -->
+	<div class="w3-content w3-padding" id="content">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+			<div class="w3-container w3-padding-32">
+				<ui:insert name="content">
+					<h:form id="form" enctype="multipart/form-data">
+						<p:growl id="msgs" showDetail="true" />
+						<!-- The Grid -->
+						<div class="w3-row-padding">
+							<!-- Left Column -->
+							<div class="w3-third">
+								<div class="w3-white w3-text-black w3-card-4">
+									<div class="w3-container">
+										<h3
+											class="w3-border-bottom w3-border-light-grey w3-padding-16">#{msg.avatar}</h3>
+										<h:panelGroup>
+											<p:graphicImage style="width:100%" resizable="true"
+												cache="false"
+												value="#{profilHandler.profileRightUser.profilePictureStream}" />
+										</h:panelGroup>
+										<br />
+										<h:panelGrid>
+											<p:fileUpload
+												value="#{profilHandler.profileRightUser.profilePicture}"
+												mode="simple" skinSimple="true" label="#{msg.choose}"
+												style="max-width:100%"
+												class="fileUpload w3-button w3-black w3-section"
+												disabled="#{!profilHandler.profileRightUser.viewProfileRight.canEdit}" />
+											<h:commandButton value="#{msg.submit}" update="@form"
+												action="#{profilHandler.upload()}"
+												disabled="#{!profilHandler.profileRightUser.viewProfileRight.canEdit}"
+												class="w3-button w3-black w3-section" />
+										</h:panelGrid>
+									</div>
+								</div>
+								<br />
+								<!-- Accordion -->
+								<div class="w3-card w3-round">
+									<div class="w3-white">
+										<h:commandLink update="@form"
+											action="#{profilHandler.changePassword()}"
+											class="w3-button w3-block w3-theme-l1 w3-left-align w3-light-grey"
+											rendered="#{profilHandler.profileRightUser.viewProfileRight.canEdit}"
+											disabled="#{!profilHandler.profileRightUser.viewProfileRight.canEdit}">
+											<i class="fa fa-key fa-fw w3-margin-right" />#{msg.password} 
+										</h:commandLink>
+										<h:commandLink
+											action="#{profilHandler.showAddresses(addressHandler)}"
+											class="w3-button w3-block w3-theme-l1 w3-left-align w3-light-grey"
+											rendered="#{profilHandler.profileRightUser.viewProfileRight.addressInformation}"
+											disabled="#{!profilHandler.profileRightUser.viewProfileRight.addressInformation}">
+											<i class="fa fa-address-card-o fa-fw w3-margin-right" />#{msg.addresses} 
+										</h:commandLink>
+										<h:commandLink action="#{profilHandler.editCreditCard()}"
+											class="w3-button w3-block w3-theme-l1 w3-left-align w3-light-grey"
+											rendered="#{profilHandler.profileRightUser.viewProfileRight.payInfoInformation}"
+											disabled="#{!profilHandler.profileRightUser.viewProfileRight.payInfoInformation}">
+											<i class="fa fa-credit-card fa-fw w3-margin-right" />#{msg.creditCard} 
+										</h:commandLink>
+										<h:commandLink action="#{profilHandler.showFriendPage(friendHandler)}"
+											class="w3-button w3-block w3-theme-l1 w3-left-align w3-light-grey"
+											rendered="#{profilHandler.profileRightUser.viewProfileRight.detailInformation}"											
+											disabled="#{!profilHandler.profileRightUser.viewProfileRight.detailInformation}">
+											<i class="fa fa-group fa-fw w3-margin-right" />#{msg.friends} 
+										</h:commandLink>
+									</div>
+								</div>
+								<br />
+							</div>
+							<!-- Right Column -->
+							<div class="w3-twothird">
+								<div class="w3-container w3-card w3-white w3-margin-bottom">
+									<h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">#{msg.profil}</h3>
+									<h:panelGrid var="profilHandler" value="#{profilHandler}"
+										columns="2" headerClass="header" footerClass="footer">
+										<h:outputLabel value="#{msg.username}:" for="username" />
+										<h:panelGroup>
+											<h:inputText id="username" required="true" readonly="true"
+												class="w3-input w3-section w3-border"
+												value="#{profilHandler.profileRightUser.username}"
+												requireMessage="entry missing">
+												<f:converter converterId="trimConverter" />
+											</h:inputText>
+											<h:message for="username" styleClass="message" />
+										</h:panelGroup>
+										<h:outputLabel value="#{msg.email}:" for="email" />
+										<h:panelGroup>
+											<h:inputText id="email" class="w3-input w3-section w3-border"
+												value="#{profilHandler.profileRightUser.email}">
+												<f:converter converterId="trimConverter" />
+												<f:validator validatorId="emailValidator" />
+											</h:inputText>
+											<h:message for="email" styleClass="message" />
+										</h:panelGroup>
+										<h:outputLabel value="#{msg.gender}:" for="gender" />
+										<h:panelGroup>
+											<h:selectOneMenu id="gender"
+												value="#{profilHandler.profileRightUser.gender}"
+												class="w3-input w3-section w3-border"
+												disabled="#{!profilHandler.profileRightUser.viewProfileRight.canEdit}">
+												<f:selectItems value="#{profilHandler.genderValues}" var="gender"
+													itemLabel="#{gender.label}" itemValue="#{gender}" />
+											</h:selectOneMenu>
+										</h:panelGroup>
+										<h:outputLabel value="#{msg.firstName}:" for="firstName" />
+										<h:panelGroup>
+											<h:inputText id="firstName"
+												class="w3-input w3-section w3-border"
+												value="#{profilHandler.profileRightUser.firstName}">
+												<f:converter converterId="trimConverter" />
+											</h:inputText>
+											<h:message for="firstName" styleClass="message" />
+										</h:panelGroup>
+										<h:outputLabel value="#{msg.lastName}:" for="lastName" />
+										<h:panelGroup>
+											<h:inputText id="lastName"
+												class="w3-input w3-section w3-border"
+												value="#{profilHandler.profileRightUser.lastName}">
+												<f:converter converterId="trimConverter" />
+											</h:inputText>
+											<h:message for="lastName" styleClass="message" />
+										</h:panelGroup>
+										<h:outputLabel value="#{msg.birthDate}:" for="birthDate" />
+										<h:panelGroup>
+											<p:calendar id="birthDate" mask="true"
+												value="#{profilHandler.profileRightUser.birthday}"
+												requireMessage="entry missing" pattern="dd.mm.yyyy"
+												timeZone="GMT"
+												class="calendarClass w3-input w3-section w3-border">
+											</p:calendar>
+											<h:message for="birthDate" styleClass="message" />
+										</h:panelGroup>
+									</h:panelGrid>
+									<h:commandButton action="#{profilHandler.save()}"
+										value="#{msg.save}" update="@form"
+										class="w3-button w3-black w3-section"
+										disabled="#{!profilHandler.profileRightUser.viewProfileRight.canEdit}" />
+									<h:commandButton action="#{returnHandler.back()}"
+										class="w3-button w3-black w3-section" value="#{msg.back}"
+										immediate="true" />
+								</div>
+							</div>
+						</div>
+					</h:form>
+				</ui:insert>
+			</div>
+		</div>
+	</div>
+</h:body>
+</html>

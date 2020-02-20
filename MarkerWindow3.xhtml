@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+	<title><ui:insert name="title">#{msg.createnewtravel}</ui:insert>
+	</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="resources/basic.css" type="text/css" />
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+	<link rel="stylesheet"
+		href="https://www.w3schools.com/lib/w3-theme-black.css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<style>
+#gmap {
+	width: 100%;
+	height: 800px;
+}
+</style>
+</h:head>
+<h:body>
+	<f:event listener="#{loginHandler.checkLoggedIn}" type="preRenderView" />
+	<script type="text/javascript"
+		src="https://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript">
+		var currentMarker = null;
+
+		function handlePointClick(event) {
+			if (currentMarker === null) {
+				document.getElementById('lat').value = event.latLng.lat();
+				document.getElementById('lng').value = event.latLng.lng();
+
+				currentMarker = new google.maps.Marker({
+					position : new google.maps.LatLng(event.latLng.lat(),
+							event.latLng.lng())
+				});
+
+				PF('map').addOverlay(currentMarker);
+
+				PF('dlg').show();
+			}
+		}
+
+		function markerAddComplete() {
+			var title = document.getElementById('title');
+			currentMarker.setTitle(title.value);
+			title.value = "";
+
+			currentMarker = null;
+			PF('dlg').hide();
+		}
+
+		function cancel() {
+			PF('dlg').hide();
+			currentMarker.setMap(null);
+			currentMarker = null;
+
+			return false;
+		}
+	</script>
+
+
+	<p:growl id="messages" showDetail="true" />
+	<ui:include src="/headers_footers/headerLoggedIn.xhtml" />
+	<div class="w3-padding" id="content">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+			<div class="w3-container w3-padding-32">
+				<ui:insert name="content">
+					<h:form prependId="false">
+						<div class="w3-row-padding w3-margin-top">
+							<div class="w3-quarter w3-container">
+								<h:commandButton class="w3-button w3-theme w3-margin-bottom"
+									action="#{travelHandler.addTravel()}"
+									value="#{msg.addDestinations}" style="width:100%;height:100%"
+									disabled="#{!travelHandler.profileRightUser.viewProfileRight.canEdit}" />
+								<div class="w3-responsive w3-card-4">
+										<h3
+											class="w3-border-bottom w3-border-light-grey w3-padding-16">#{msg.createnewtravel}</h3>
+										<h:panelGrid var="travel" value="#{travelHandler.tmpTravel}"
+											columns="2" headerClass="header" footerClass="footer">
+											<h:outputLabel value="#{msg.titel}:" for="titel" />
+											<br />
+											<h:panelGroup>
+												<p:inputText required="true" id="titel"
+													value="#{travelHandler.tmpTravel.title}"
+													requireMessage="#{msg.titel}: #{msg.entry} #{msg.missing}">
+												</p:inputText>
+											</h:panelGroup>
+											<br />
+											<h:outputLabel value="#{msg.description}:" for="text" />
+											<br />
+											<h:panelGroup>
+												<p:inputTextarea id="text"
+													value="#{travelHandler.tmpTravel.text}" rows="6" cols="27"
+													required="true"
+													requireMessage="#{msg.description}: #{msg.entry} #{msg.missing}" />
+											</h:panelGroup>
+											<br />
+											<h:panelGroup>
+											<p:selectBooleanCheckbox
+												value="#{travelHandler.tmpTravel.publicTravel}"
+												itemLabel="#{msg.ispublic}" />
+											</h:panelGroup>
+										</h:panelGrid>
+									</div>
+									<h:commandButton class="w3-button w3-theme w3-margin-top"
+										action="#{returnHandler.back()}" value="#{msg.cancel}"
+										style="width:100%;height:100%" immediate="true"/>
+							</div>
+							<div class="w3-threequarter w3-container">
+								<p:gmap id="gmap" center="#{travelHandler.center}" zoom="13"
+									type="HYBRID" model="#{travelHandler.advancedModel}"
+									widgetVar="map">
+								</p:gmap>
+							</div>
+						</div>
+					</h:form>
+				</ui:insert>
+			</div>
+		</div>
+	</div>
+	<div class="w3-container w3-bottom w3-center w3-black w3-padding-16">
+		<ui:insert name="footer">
+			<i class="fa fa-copyright" />
+			<a href="/td/about.xhtml" title="#{msg.developers}" target="_blank"
+				class="w3-hover-text-green">Maximilian Werner, Philipp Köhnken
+				und Tobias Stelter</a>
+		</ui:insert>
+	</div>
+</h:body>
+</html>

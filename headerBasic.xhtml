@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+	<title><ui:insert name="title">#{msg.company} #{msg.home}</ui:insert>
+	</title>
+	<link rel="stylesheet"
+		href="#{request.contextPath}/resources/basic.css" type="text/css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="#{request.contextPath}/resources/w3.css"
+		type="text/css" />
+</h:head>
+<h:body>
+	<div class="w3-top">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+			<ui:insert name="header">
+				<h:form>
+					<a href="/td/index.xhtml" class="w3-bar-item w3-button"><b>TD</b>
+						TravelDiary</a>
+				</h:form>
+			</ui:insert>
+		</div>
+	</div>
+</h:body>
+</html>

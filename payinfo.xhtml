@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<link rel="stylesheet"
+		href="#{request.contextPath}/resources/basic.css" type="text/css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="#{request.contextPath}/resources/w3.css"
+		type="text/css" />
+	<title><ui:insert name="title">
+${msg.creditCard}
+</ui:insert></title>
+</h:head>
+<h:body>
+	<f:event listener="#{loginHandler.checkLoggedIn}" type="preRenderView" />
+	<!-- Header -->
+	<ui:include src="/headers_footers/headerLoggedIn.xhtml" />
+	<!-- Content -->
+	<div class="w3-content w3-padding" id="content">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+			<div class="w3-container w3-padding-32">
+				<ui:insert name="content">
+					<h:form id="form">
+						<p:growl id="message_growl" />
+						<h:panelGrid var="user" value="#{profilHandler}" columns="2"
+							headerClass="header" footerClass="footer">
+							<h:outputLabel value="#{msg.user}:" for="username" />
+							<h:panelGroup>
+								<h:inputText id="username" required="true" readonly="true"
+									class="w3-input w3-section w3-border"
+									value="#{profilHandler.profileRightUser.completeName}">
+								</h:inputText>
+							</h:panelGroup>
+							<h:outputLabel value="typ:" for="typ" />
+							<h:panelGroup>
+								<h:selectOneMenu id="typ"
+									value="#{profilHandler.profileRightUser.payInfo.payInfoTyp}"
+									class="w3-input w3-section w3-border"
+									disabled="#{!profilHandler.profileRightUser.viewProfileRight.canEdit}">
+									<f:selectItems var="form"
+										value="#{profilHandler.payInfoTypeValues}" itemValue="#{form}"
+										itemLabel="#{form.label}" />
+								</h:selectOneMenu>
+							</h:panelGroup>
+							<h:outputLabel value="#{msg.number}:" for="number" />
+							<h:panelGroup>
+								<h:inputText required="true" id="number"
+									value="#{profilHandler.profileRightUser.payInfo.number}"
+									requireMessage="entry missing"
+									class="w3-input w3-section w3-border">
+									<f:converter converterId="trimConverter" />
+									<f:converter converterId="creditCardConverter" />
+									<f:validator validatorId="creditCardValidator" />
+								</h:inputText>
+								<h:message for="number" styleClass="message" />
+							</h:panelGroup>
+							<h:outputLabel value="#{msg.owner}:" for="owner" />
+							<h:panelGroup>
+								<h:inputText required="true" id="owner"
+									value="#{profilHandler.profileRightUser.payInfo.owner}"
+									requireMessage="entry missing"
+									class="w3-input w3-section w3-border">
+									<f:converter converterId="trimConverter" />
+								</h:inputText>
+								<h:message for="owner" styleClass="message" />
+							</h:panelGroup>
+							<h:outputLabel value="#{msg.dateOfExpiry}:" for="dateOfExpiry" />
+							<h:panelGroup>
+								<p:calendar required="true" mask="true" id="dateOfExpiry"
+									value="#{profilHandler.profileRightUser.payInfo.dateOfExpiry}"
+									requireMessage="entry missing" pattern="dd.MM.yyyy"
+									class="calendarClass w3-input w3-section w3-border">
+								</p:calendar>
+								<h:message for="dateOfExpiry" styleClass="message" />
+							</h:panelGroup>
+						</h:panelGrid>
+						<h:commandButton action="#{profilHandler.save()}"
+							value="#{msg.save}" update="message_growl"
+							disabled="#{!profilHandler.profileRightUser.viewProfileRight.canEdit}"
+							class="w3-button w3-black w3-section" />
+						<h:commandButton immediate="true" action="#{returnHandler.back()}"
+							value="#{msg.back}" class="w3-button w3-black w3-section" />
+					</h:form>
+				</ui:insert>
+			</div>
+		</div>
+	</div>
+	<!-- Footer -->
+	<ui:include src="/headers_footers/footer.xhtml" />
+</h:body>
+</html>

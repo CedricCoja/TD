@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<link rel="stylesheet" href="resources/basic.css" type="text/css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="#{request.contextPath}/resources/w3.css"
+		type="text/css" />
+	<title><ui:insert name="title">
+#{msg.address}
+</ui:insert></title>
+</h:head>
+<h:body>
+	<f:event listener="#{loginHandler.checkLoggedIn}" type="preRenderView" />
+	<div class="w3-top">
+		<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+				<ui:insert name="header">
+					<h:form>
+						<a href="/td/home.xhtml" class="w3-bar-item w3-button"><b>TD</b>
+							TravelDiary</a>
+
+						<div class="w3-right w3-hide-small">
+							<h:commandButton class="w3-bar-item w3-button"
+								action="#{travelHandler.showTravels()}"
+								value="#{msg.travelmanagement}" />
+
+							<h:commandButton class="w3-bar-item w3-button"
+								action="#{userHandler.searchuser()}"
+								value="#{msg.usermanagement}" />
+
+							<h:commandButton class="w3-bar-item w3-button"
+								action="#{userHandler.showProfil(userHandler.user)}"
+								value="#{msg.profil}" />
+						</div>
+					</h:form>
+				</ui:insert>
+		</div>
+		<div class="w3-content w3-padding" id="content">
+			<div class="w3-bar w3-white w3-wide w3-padding w3-card">
+				<div class="w3-container w3-padding-32">
+					<ui:insert name="content">
+						<h:form>
+							<h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Neue Reise anlegen</h3>
+							<h:panelGrid var="travel" value="#{travelHandler.travel}"
+								columns="2" headerClass="header" footerClass="footer">
+
+								<h:outputLabel value="Titel:" for="titel" />
+								<h:panelGroup>
+									<p:inputText required="true" id="titel"
+										value="#{travelHandler.travel.title}"
+										requireMessage="Eingabe fehlt">
+									</p:inputText>
+								</h:panelGroup>
+
+								<h:outputLabel value="Lat:" for="Lat" />
+								<h:panelGroup>
+									<p:inputText required="true" id="Lat"
+										value="#{travelHandler.travel.lat}"
+										requireMessage="Eingabe fehlt">
+									</p:inputText>
+								</h:panelGroup>
+
+								<h:outputLabel value="Lng:" for="Lng" />
+								<h:panelGroup>
+									<p:inputText required="true" id="Lng"
+										value="#{travelHandler.travel.lng}"
+										requireMessage="Eingabe fehlt">
+									</p:inputText>
+								</h:panelGroup>
+
+							</h:panelGrid>
+							<h:commandButton class="w3-button w3-black w3-section"
+								action="#{travelHandler.saveTravel()}"
+								value="#{msg.save}" update="message_growl" />
+						</h:form>
+					</ui:insert>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="w3-container w3-bottom w3-center w3-black w3-padding-16">
+		<ui:insert name="footer">
+			<i class="fa fa-copyright" />
+			<a href="/td/about.xhtml" title="#{msg.developers}" target="_blank"
+				class="w3-hover-text-green">Maximilian Werner, Philipp Köhnken
+				und Tobias Stelter</a>
+		</ui:insert>
+	</div>
+</h:body>
+</html>
